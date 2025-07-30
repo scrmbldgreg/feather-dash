@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feather Dash - Lobby</title>
+  <link rel="stylesheet" href="css/game.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <style>
+    .hidden { display: none; }
+    .lobby-container { text-align: center; padding: 20px; max-width: 400px; margin: auto; }
+    button { margin: 5px; padding: 10px 20px; }
+    input { margin: 5px; padding: 8px; width: 80%; }
+  </style>
+</head>
+<body class="lobby-page">
+  <div class="lobby-container">
+    <h1>Feather Dash</h1>
+
+    <!-- Initial Menu -->
+    <div id="menu">
+      <button id="showCreate">Create Lobby</button>
+      <button id="showJoin">Join Lobby</button>
+    </div>
+
+    <!-- Create Lobby Form -->
+    <div id="createSection" class="hidden">
+      <input id="createName" placeholder="Enter your name" />
+      <button id="createLobbyBtn">Create Lobby</button>
+      <p id="inviteLink" class="hidden"></p>
+    </div>
+
+    <!-- Join Lobby Form -->
+    <div id="joinSection" class="hidden">
+      <input id="joinName" placeholder="Enter your name" />
+      <input id="joinCode" placeholder="Lobby Code" />
+      <button id="joinLobbyBtn">Join Lobby</button>
+    </div>
+
+    <!-- Lobby Info -->
+    <div id="lobbyInfo" class="hidden">
+      <p>Lobby Code: <strong id="lobbyCodeDisplay"></strong></p>
+      <div id="playerList"></div>
+      <button id="startGameBtn" class="hidden">Start Game</button>
+    </div>
+  </div>
+
+  <script src="js/lobby.js"></script>
+</body>
+</html>

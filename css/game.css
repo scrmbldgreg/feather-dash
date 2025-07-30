@@ -1,0 +1,298 @@
+/* === Global Background === */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #70c5ce 0%, #4fb3d3 100%); /* Blue gradient */
+  color: white;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === Lobby Container === */
+.lobby-container {
+  max-width: 420px;
+  width: 90%;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Soft shadow */
+  backdrop-filter: blur(4px);
+}
+
+/* === Headings === */
+h1 {
+  font-size: 48px;
+  margin-bottom: 30px;
+  color: #fff3e0; /* Soft cream */
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4); /* Glow effect */
+}
+
+/* === Inputs === */
+.lobby-container input {
+  width: 80%;
+  padding: 12px;
+  font-size: 16px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* === Buttons === */
+.lobby-container button {
+  width: 85%;
+  padding: 14px 20px;
+  font-size: 18px;
+  margin: 10px 0;
+  background: linear-gradient(to bottom, #ffb74d, #ff9800); /* Gradient like index */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.lobby-container button:hover {
+  background: linear-gradient(to bottom, #ffa726, #fb8c00); /* Slightly darker */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+/* === Player List === */
+#playerList {
+  margin-top: 20px;
+  text-align: left;
+}
+
+#playerList div {
+  margin: 5px 0;
+  font-size: 18px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* 🔹 Prevent scrollbars */
+}
+
+#gameCanvas {
+  display: block;
+  background: #70c5ce;
+  width: 100vw;  /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+}
+
+/* Webcam bottom-left */
+#webcam {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 160px;
+  height: 120px;
+  border: 3px solid white;
+  border-radius: 8px;
+  z-index: 10;
+  background: black;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Game timer top-center */
+#timer {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  font-weight: bold;
+  color: #fff3e0; /* soft cream */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
+/* Score top-right */
+#scoreDisplay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffeb99; /* light yellow for visibility */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
+/* Countdown overlay */
+#prepCountdown {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8rem;
+  font-weight: bold;
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#prepCountdown.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+#prepCountdown.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+
+
+/* Leaderboard - bottom-right */
+#leaderboard {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: white;
+  width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+#leaderboard h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 4px;
+}
+
+#leaderboardList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#leaderboardList li {
+  font-size: 14px;
+  margin: 4px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+/* Lobby Page */
+.lobby-page {
+  text-align: center;
+  background: linear-gradient(#70c5ce, #4aa2af); /* same as game sky gradient */
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.lobby-container {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 30px 40px;
+  border-radius: 15px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.lobby-container h1 {
+  font-size: 48px;
+  margin-bottom: 30px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.lobby-container input {
+  width: 80%;
+  padding: 12px;
+  font-size: 16px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.lobby-container button {
+  width: 85%;
+  padding: 14px 20px;
+  font-size: 18px;
+  margin: 10px 0;
+  background: linear-gradient(#ffb74d, #ffa726);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.lobby-container button:hover {
+  background: linear-gradient(#ffa726, #fb8c00);
+  transform: translateY(-2px);
+}
+#playerList {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the list horizontally */
+  justify-content: center;
+  text-align: center;
+}
+
+#playerList div {
+  font-size: 18px;
+  margin: 5px 0;
+}
+
+#lobbyInfo {
+  margin-top: 20px;
+}
+
+/* Simple fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+    #startGameBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 24px;
+      font-size: 20px;
+      background: #ffb74d;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    #startGameBtn:hover {
+      background: #ffa726;
+      transform: translateY(-2px);
+    }

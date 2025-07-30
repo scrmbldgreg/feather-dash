@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feather Dash</title>
+  <link rel="stylesheet" href="css/game.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- Countdown -->
+  <div id="prepCountdown"></div>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Webcam Preview -->
+  <video id="webcam" autoplay muted playsinline></video>
+  <canvas id="motionCanvas" style="display:none;"></canvas>
+
+  <!-- HUD -->
+  <div id="timer">90</div>
+  <div id="scoreDisplay">Score: 0</div>
+
+  <!-- Leaderboard -->
+  <div id="leaderboard">
+    <h3>Leaderboard</h3>
+    <ul id="leaderboardList"></ul>
+  </div>
+
+  <!-- Assets (hidden) -->
+  <img id="ground" src="assets/bricks.jpg" style="display:none;">
+  <img id="bird1" src="assets/flappy-bird-1.png" style="display:none;">
+  <img id="bird2" src="assets/flappy-bird-2.png" style="display:none;">
+  <img id="pipeTip" src="assets/pipe-tip.png" style="display:none;">
+  <img id="pipeBody" src="assets/pipe-body.png" style="display:none;">
+
+<!-- Cloud Assets -->
+<img id="cloud1" src="assets/cloud-1.png" style="display:none;">
+<img id="cloud2" src="assets/cloud-2.png" style="display:none;">
+<img id="cloud3" src="assets/cloud-3.png" style="display:none;">
+<img id="cloud4" src="assets/cloud-4.png" style="display:none;">
+<img id="cloud5" src="assets/cloud-5.png" style="display:none;">
+<img id="cloud6" src="assets/cloud-6.png" style="display:none;">
+<img id="cloud7" src="assets/cloud-7.png" style="display:none;">
+<img id="cloud8" src="assets/cloud-8.png" style="display:none;">
+
+<!-- Background Music -->
+<audio id="bgm" src="assets/bgm.mp3" loop></audio>
+
+  <!-- Game Script -->
+  <script type="module">
+    // Import motion.js first
+    import { initMotion } from './js/motion.js';
+
+    // Expose flap() globally for motion.js to call
+    window.flap = function() {
+      if (typeof flapInternal === 'function') flapInternal();
+    };
+
+    // Dynamically import the game AFTER motion is set up
+    import('./js/game-multiplayer.js').then(() => {
+      console.log("🎮 Game script loaded");
+      // Start motion detection once game script and canvas are ready
+      initMotion(() => {
+        console.log("🐤 Motion detected! Calling flap()");
+        window.flap();
+      });
+    });
+  </script>
+</body>
+</html>
