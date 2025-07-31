@@ -398,11 +398,11 @@ function showGameOverOverlay() {
 
   overlay.innerHTML = `
     <div class="lobby-container" style="text-align:center;color:white;">
-      <h1 style="font-size:48px;margin-bottom:20px;">Game Over!</h1>
-      <p style="font-size:28px;margin-bottom:30px;">Score: ${score}</p>
+      <h1 style="font-size:48px;margin-bottom:20px;">Crash Landing</h1>
+      <p style="font-size:28px;margin-bottom:30px;">Beak Points: ${score}</p>
       <div style="display:flex; justify-content:center; gap:20px;">
-        <button id="playAgain" class="cta-button">Play Again</button>
-        <button id="exitBtn" class="cta-button">Exit</button>
+        <button id="playAgain" class="cta-button">Fly Again</button>
+        <button id="exitBtn" class="cta-button">Fly Home</button>
       </div>
     </div>
   `;

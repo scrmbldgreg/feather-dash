@@ -109,7 +109,7 @@ html, body {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 48px;
+  font-size: 60px;
   font-weight: bold;
   color: #fff3e0; /* soft cream */
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
@@ -119,10 +119,10 @@ html, body {
 /* Score top-right */
 #scoreDisplay {
   position: fixed;
-  top: 20px;
+  top: 24px;
   right: 20px;
-  font-size: 36px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: normal;
   color: #ffeb99; /* light yellow for visibility */
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
   z-index: 20;
@@ -285,7 +285,7 @@ html, body {
       display: block;
       margin: 20px auto;
       padding: 12px 24px;
-      font-size: 20px;
+      font-size: 18px;
       background: #ffb74d;
       border: none;
       border-radius: 10px;

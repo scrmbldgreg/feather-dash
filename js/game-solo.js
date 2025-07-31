@@ -24,7 +24,7 @@ bgm.volume = 0.3;
 let bird = { x: 150, y: window.innerHeight / 2, velocity: -2 }; // Center start
 let gravity = 0.5; // Adjusted for solo mode
 let score = 0;
-let timer = 60;
+let timer = 30;
 let gameOver = false;
 let gameStarted = false;
 let assetsLoaded = false;
@@ -288,7 +288,7 @@ function update() {
 
       if (!pipe.scored && bird.x > pipe.x + canvas.width * pipeWidthRatio) {
         score++;
-        scoreDisplay.textContent = `Score: ${score}`;
+        scoreDisplay.textContent = `Beak Points: ${score}`;
         pipe.scored = true;
         pipeSpeed = 3 + Math.floor(score / 5);
       }
@@ -478,18 +478,18 @@ function showWinnerOverlay(finalScore) {
 
   overlay.innerHTML = `
     <div class="lobby-container" style="text-align:center;color:white;">
-      <h1 style="font-size:48px;margin-bottom:20px;">Game Over!</h1>
-      <p style="font-size:28px;margin-bottom:30px;">Score: ${score}</p>
+      <h1 style="font-size:48px;margin-bottom:20px;">Flight Ended</h1>
+      <p style="font-size:28px;margin-bottom:30px;">Beak Points: ${score}</p>
       <div style="display:flex; justify-content:center; gap:20px;">
-        <button id="playAgain" class="cta-button">Play Again</button>
-        <button id="exitBtn" class="cta-button">Exit</button>
+        <button id="playAgain" class="cta-button">Fly Again</button>
+        <button id="exitBtn" class="cta-button">Fly Home</button>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
 
   document.getElementById('playAgain').onclick = () => {
-    // A simple page reload for "Play Again" in solo mode
+    // A simple page reload for "Fly Again" in solo mode
     window.location.reload();
   };
   document.getElementById('exitBtn').onclick = () => {
@@ -520,7 +520,7 @@ function resetGame() {
   timer = 30;
   gameOver = false;
   stopped = false;
-  scoreDisplay.textContent = `Score: 0`;
+  scoreDisplay.textContent = `Beak Points: 0`;
   gameTimerEl.textContent = timer;
 
   // Reset clouds

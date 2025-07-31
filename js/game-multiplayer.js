@@ -38,7 +38,7 @@ const leaderboardList = document.getElementById('leaderboardList');
 let bird = { x: 150, y: window.innerHeight / 2, velocity: -2 };
 let gravity = 0.5;
 let score = 0;
-let timer = 90;
+let timer = 45; // 45 seconds for multiplayer
 let gameOver = false;
 let gameStarted = false;
 let players = {};
@@ -359,7 +359,7 @@ function update() {
 
       if (!pipe.scored && bird.x > pipe.x + canvas.width * pipeWidthRatio) {
         score++;
-        scoreDisplay.textContent = `Score: ${score}`;
+        scoreDisplay.textContent = `Beak Points: ${score}`;
         pipe.scored = true;
         pipeSpeed = 3 + Math.floor(score / 5);
       }
@@ -592,11 +592,11 @@ function showWinnerOverlay(winner, score) {
 
   overlay.innerHTML = `
     <div class="lobby-container" style="text-align:center;color:white;">
-      <h1 style="font-size:48px;margin-bottom:20px;">🏆 Winner: ${winner}</h1>
-      <p style="font-size:28px;margin-bottom:30px;">Score: ${score}</p>
+      <h1 style="font-size:48px;margin-bottom:20px;">Sky Champion: ${winner}</h1>
+      <p style="font-size:28px;margin-bottom:30px;">Beak Points: ${score}</p>
       <div style="display:flex; justify-content:center; gap:20px;">
-        <button id="playAgain" class="cta-button">Play Again</button>
-        <button id="exitBtn" class="cta-button">Exit</button>
+        <button id="playAgain" class="cta-button">Fly Again</button>
+        <button id="exitBtn" class="cta-button">Fly Home</button>
       </div>
     </div>
   `;
@@ -606,7 +606,7 @@ function showWinnerOverlay(winner, score) {
   document.getElementById('exitBtn').onclick = () => {
     window.location.href = 'index.html';
   };
-  // Play Again → Reset player state & go to lobby
+  // Fly Again → Reset player state & go to lobby
 document.getElementById('playAgain').onclick = async () => {
   const lobbyRef = db.collection('lobbies').doc(lobbyCode);
   const playerRef = lobbyRef.collection('players').doc(playerId);
@@ -622,13 +622,13 @@ document.getElementById('playAgain').onclick = async () => {
   await lobbyRef.update({ rematchRequested: Date.now() });
 
   // 🔹 Go back to the lobby page (host will still see this lobby)
-  window.location.href = 'lobby.html';
+  window.location.href = 'gather-flock.html';
 };
 
   // Auto return to lobby after 10s if user does nothing
   setTimeout(() => {
     if (document.body.contains(overlay)) {
-      window.location.href = `lobby.html`;
+      window.location.href = `gather-flock.html`;
     }
   }, 10000);
 }

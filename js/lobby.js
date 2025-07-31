@@ -43,7 +43,7 @@ lobbyInfo.insertBefore(playerCountDisplay, playerListDiv);
 // Ready button (MIDDLE)
 const readyBtn = document.createElement('button');
 readyBtn.id = 'readyBtn';
-readyBtn.textContent = 'Ready';
+readyBtn.textContent = 'All Feathers Set';
 readyBtn.style.display = 'none';
 lobbyInfo.insertBefore(readyBtn, startGameBtn);
 
@@ -219,7 +219,7 @@ function showLobby() {
         startGameBtn.classList.remove('hidden');
         startGameBtn.style.display = 'inline-block';
         startGameBtn.disabled = true;
-        startGameBtn.textContent = 'Waiting for Players...';
+        startGameBtn.textContent = 'Assembling Wings...';
       }
     }
   });
@@ -245,16 +245,16 @@ function showLobby() {
     });
 
     // Update player count
-    playerCountDisplay.textContent = `Players: ${totalPlayers}/10`;
+    playerCountDisplay.textContent = `Flyers: ${totalPlayers}/10`;
 
     // Host can start only if all ready
     if (playerId === ownerId) {
       if (readyPlayers === totalPlayers && totalPlayers > 0) {
         startGameBtn.disabled = false;
-        startGameBtn.textContent = 'Start Game';
+        startGameBtn.textContent = 'Take Flight!';
       } else {
         startGameBtn.disabled = true;
-        startGameBtn.textContent = `Waiting for Players (${readyPlayers}/${totalPlayers})`;
+        startGameBtn.textContent = `Assembling Wings... (${readyPlayers}/${totalPlayers})`;
       }
     }
   });
@@ -262,7 +262,7 @@ function showLobby() {
   // Listen for game start
   lobbyRef.onSnapshot((doc) => {
     if (doc.exists && doc.data().started) {
-      window.location.href = `game.html?lobby=${lobbyCode}&player=${playerId}&name=${encodeURIComponent(playerName)}`;
+      window.location.href = `sky-race.html?lobby=${lobbyCode}&player=${playerId}&name=${encodeURIComponent(playerName)}`;
     }
   });
 }
@@ -277,7 +277,7 @@ readyBtn.onclick = async () => {
   isReady = !isReady;
   await playerRef.update({ ready: isReady });
 
-  readyBtn.textContent = isReady ? 'Cancel' : 'Ready';
+  readyBtn.textContent = isReady ? 'Clip Wings' : 'All Feathers Set';
 };
 
 // =========================

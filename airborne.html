@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feather Dash - Quick Soar</title>
+  <title>Feather Dash - Airborne</title>
   <link rel="stylesheet" href="css/game.css" />
 </head>
 <body>
@@ -19,8 +19,7 @@
   <canvas id="motionCanvas" style="display:none;"></canvas>
 
   <!-- HUD -->
-  <div id="timer">60</div>
-  <div id="scoreDisplay">Score: 0</div>
+  <div id="scoreDisplay">Beak Points: 0</div>
 
   <!-- Assets (hidden) -->
   <img id="ground" src="assets/bricks.jpg" style="display:none;">
@@ -28,16 +27,15 @@
   <img id="pipeTip" src="assets/pipe-tip.png" style="display:none;">
   <img id="pipeBody" src="assets/pipe-body.png" style="display:none;">
 
-<!-- Clouds -->
-<img id="cloud1" src="assets/cloud-1.png" style="display:none;">
-<img id="cloud2" src="assets/cloud-2.png" style="display:none;">
-<img id="cloud3" src="assets/cloud-3.png" style="display:none;">
-<img id="cloud4" src="assets/cloud-4.png" style="display:none;">
-<img id="cloud5" src="assets/cloud-5.png" style="display:none;">
-<img id="cloud6" src="assets/cloud-6.png" style="display:none;">
-<img id="cloud7" src="assets/cloud-7.png" style="display:none;">
-<img id="cloud8" src="assets/cloud-8.png" style="display:none;">
-
+  <!-- Clouds -->
+  <img id="cloud1" src="assets/cloud-1.png" style="display:none;">
+  <img id="cloud2" src="assets/cloud-2.png" style="display:none;">
+  <img id="cloud3" src="assets/cloud-3.png" style="display:none;">
+  <img id="cloud4" src="assets/cloud-4.png" style="display:none;">
+  <img id="cloud5" src="assets/cloud-5.png" style="display:none;">
+  <img id="cloud6" src="assets/cloud-6.png" style="display:none;">
+  <img id="cloud7" src="assets/cloud-7.png" style="display:none;">
+  <img id="cloud8" src="assets/cloud-8.png" style="display:none;">
 
 <!-- Back Button & Volume Control -->
 <div id="controls">
@@ -62,23 +60,24 @@
   🔊
 </button>
 
-<!-- Background Music -->
-<audio id="bgm" src="assets/bgm.mp3" loop preload="auto"></audio>
+
+  <!-- Background Music -->
+  <audio id="bgm" src="assets/bgm.mp3" loop preload="auto"></audio>
   <audio id="countdownBeep" src="assets/countdown.mp3" preload="auto"></audio>
 
   <!-- Game Script -->
-<script type="module">
-  import { initMotion } from './js/motion-solo.js';
-  window.flap = () => window.flapInternal && window.flapInternal();
+  <script type="module">
+    import { initMotion } from './js/motion-solo.js';
+    window.flap = () => window.flapInternal && window.flapInternal();
 
-  import('./js/game-solo.js').then(() => {
-    console.log("🎮 Solo game loaded");
-    initMotion(() => window.flap());
-  });
-  // Back Button
+    import('./js/game-endless.js').then(() => {
+      console.log("🎮 Endless game loaded");
+      initMotion(() => window.flap());
+    });
+    // Back Button
 document.getElementById('backBtn').onclick = () => {
   window.location.href = 'index.html';
-};
-</script>
+};   
+  </script>
 </body>
 </html>

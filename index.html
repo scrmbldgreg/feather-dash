@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feather Dash - Home</title>
+  <title>Feather Dash</title>
   <link rel="stylesheet" href="css/game.css" />
 
   <!-- Firebase (optional for solo stats) -->
@@ -21,15 +21,15 @@
 
     <!-- Step 1: Main Menu -->
     <div id="mainMenu">
-      <button id="soloBtn">Solo</button>
-      <button id="multiplayerBtn">Multiplayer</button>
+      <button id="soloBtn">Solo Flight</button>
+      <button id="multiplayerBtn">Sky Race</button>
     </div>
 
     <!-- Step 2: Solo Menu -->
     <div id="soloMenu" class="hidden">
-      <button onclick="window.location.href='time-trial.html'">Time-Trial</button>
-      <button onclick="window.location.href='endless.html'">Endless</button>
-      <button onclick="goBackToMain()">Back</button>
+      <button onclick="window.location.href='quick-soar.html'">Quick Soar</button>
+      <button onclick="window.location.href='airborne.html'">Airborne</button>
+      <button onclick="goBackToMain()">Fly Home</button>
     </div>
   </div>
 
@@ -76,7 +76,7 @@
     };
 
     document.getElementById('multiplayerBtn').onclick = () => {
-      window.location.href = 'lobby.html';
+      window.location.href = 'gather-flock.html';
     };
 
     function goBackToMain() {
