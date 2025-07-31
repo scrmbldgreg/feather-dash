@@ -6,7 +6,7 @@
   <title>Feather Dash - Home</title>
   <link rel="stylesheet" href="css/game.css" />
 
-  <!-- Firebase -->
+  <!-- Firebase (optional for solo stats) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
@@ -25,42 +25,84 @@
       <button id="multiplayerBtn">Multiplayer</button>
     </div>
 
-    <!-- Step 2: Multiplayer Menu -->
-    <div id="multiMenu" class="hidden">
-      <button id="showCreate">Create Lobby</button>
-      <button id="showJoin">Join Lobby</button>
-    </div>
-
-    <!-- Step 3: Create Lobby -->
-    <div id="createSection" class="hidden">
-      <input id="createName" placeholder="Enter your name" />
-      <button id="createLobbyBtn">Create Lobby</button>
-      <p id="inviteLink" class="hidden"></p>
-    </div>
-
-    <!-- Step 4: Join Lobby -->
-    <div id="joinSection" class="hidden">
-      <input id="joinName" placeholder="Enter your name" />
-      <input id="joinCode" placeholder="Lobby Code" />
-      <button id="joinLobbyBtn">Join Lobby</button>
-    </div>
-
-    <!-- Step 5: Lobby Info -->
-    <div id="lobbyInfo" class="hidden">
-      <p>Lobby Code: <strong id="lobbyCodeDisplay"></strong></p>
-      <div id="playerList"></div>
-      <button id="startGameBtn" class="hidden" style="display:none;">Start Game</button>
+    <!-- Step 2: Solo Menu -->
+    <div id="soloMenu" class="hidden">
+      <button onclick="window.location.href='time-trial.html'">Time-Trial</button>
+      <button onclick="window.location.href='endless.html'">Endless</button>
+      <button onclick="goBackToMain()">Back</button>
     </div>
   </div>
 
-  <script src="js/lobby.js"></script>
+  <!-- 🔊 Volume Button (Bottom-Right) -->
+  <button id="volumeBtn">🔊</button>
+
+  <!-- 🎵 Audio -->
+  <audio id="bgm" src="assets/bgm.mp3" loop preload="auto"></audio>
+
   <script>
-    // Navigation buttons
-    document.getElementById('soloBtn').onclick = () => window.location.href = 'solo.html';
-    document.getElementById('multiplayerBtn').onclick = () => {
-      document.getElementById('mainMenu').classList.add('hidden');
-      document.getElementById('multiMenu').classList.remove('hidden');
+    const mainMenu = document.getElementById('mainMenu');
+    const soloMenu = document.getElementById('soloMenu');
+
+    const bgm = document.getElementById('bgm');
+    const volumeBtn = document.getElementById('volumeBtn');
+
+    // =========================
+    // Volume Control
+    // =========================
+    const volumeLevels = [0.25, 0.5, 0.75, 1, 0]; // 0 = mute
+    const volumeIcons  = ['🔉', '🔉', '🔊', '🔊', '🔇'];
+    let currentVolumeIndex = 0; // start at 100% volume
+
+    // Restore last volume if saved
+    const savedVolume = localStorage.getItem('featherVolumeIndex');
+    if (savedVolume !== null) currentVolumeIndex = parseInt(savedVolume, 10);
+
+    bgm.volume = volumeLevels[currentVolumeIndex];
+    volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+
+    volumeBtn.addEventListener('click', () => {
+      currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
+      bgm.volume = volumeLevels[currentVolumeIndex];
+      volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+      localStorage.setItem('featherVolumeIndex', currentVolumeIndex);
+    });
+
+    // =========================
+    // Menu Logic
+    // =========================
+    document.getElementById('soloBtn').onclick = () => {
+      mainMenu.classList.add('hidden');
+      soloMenu.classList.remove('hidden');
     };
+
+    document.getElementById('multiplayerBtn').onclick = () => {
+      window.location.href = 'lobby.html';
+    };
+
+    function goBackToMain() {
+      soloMenu.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+    }
+
+    // =========================
+    // Autoplay on Load
+    // =========================
+    function startBGM() {
+      if (bgm.paused) {
+        bgm.currentTime = 0;
+        bgm.play().catch(() => {
+          console.log("Autoplay blocked. Will start on first click.");
+        });
+      }
+    }
+
+    // Try autoplay on page load
+    window.addEventListener('load', () => {
+      startBGM();
+    });
+
+    // Fallback: start on first interaction if blocked
+    document.body.addEventListener('click', startBGM, { once: true });
   </script>
 </body>
 </html>

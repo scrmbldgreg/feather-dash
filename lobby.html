@@ -10,45 +10,126 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
+
   <style>
     .hidden { display: none; }
     .lobby-container { text-align: center; padding: 20px; max-width: 400px; margin: auto; }
     button { margin: 5px; padding: 10px 20px; }
     input { margin: 5px; padding: 8px; width: 80%; }
+    #playerList div { margin: 3px 0; }
   </style>
 </head>
 <body class="lobby-page">
   <div class="lobby-container">
     <h1>Feather Dash</h1>
 
-    <!-- Initial Menu -->
-    <div id="menu">
+    <!-- Step 1: Lobby Menu -->
+    <div id="multiMenu">
       <button id="showCreate">Create Lobby</button>
       <button id="showJoin">Join Lobby</button>
+      <button onclick="window.location.href='index.html'">Back</button>
     </div>
 
-    <!-- Create Lobby Form -->
+    <!-- Step 2: Create Lobby -->
     <div id="createSection" class="hidden">
       <input id="createName" placeholder="Enter your name" />
       <button id="createLobbyBtn">Create Lobby</button>
-      <p id="inviteLink" class="hidden"></p>
+      
+      <!-- Invite Link Container -->
+      <div id="inviteContainer" class="hidden">
+        <button id="inviteBtn">Share Invite Link</button>
+        <p id="inviteLink"></p>
+      </div>
+
+      <button id="backFromCreate">Back</button>
     </div>
 
-    <!-- Join Lobby Form -->
+    <!-- Step 3: Join Lobby -->
     <div id="joinSection" class="hidden">
       <input id="joinName" placeholder="Enter your name" />
       <input id="joinCode" placeholder="Lobby Code" />
       <button id="joinLobbyBtn">Join Lobby</button>
+      <button id="backFromJoin">Back</button>
     </div>
 
-    <!-- Lobby Info -->
+    <!-- Step 4: Lobby Info -->
     <div id="lobbyInfo" class="hidden">
       <p>Lobby Code: <strong id="lobbyCodeDisplay"></strong></p>
       <div id="playerList"></div>
       <button id="startGameBtn" class="hidden">Start Game</button>
+      <button id="backFromLobby">Back</button>
     </div>
   </div>
 
+  <!-- 🔊 Volume Button (Bottom-Right) -->
+  <button id="volumeBtn">🔊</button>
+
+  <!-- 🎵 Audio -->
+<audio id="bgm" src="assets/bgm.mp3" loop preload="auto" muted></audio>
+
   <script src="js/lobby.js"></script>
+<script>
+  const bgm = document.getElementById('bgm');
+  const volumeBtn = document.getElementById('volumeBtn');
+
+  // Volume levels and icons
+  const volumeLevels = [0.25, 0.5, 0.75, 1, 0]; 
+  const volumeIcons  = ['🔉', '🔉', '🔊', '🔊', '🔇'];
+  let currentVolumeIndex = 0; // Start at 25%
+  let targetVolume = volumeLevels[currentVolumeIndex];
+
+  // Restore last volume if saved
+  const savedVolume = localStorage.getItem('featherVolumeIndex');
+  if (savedVolume !== null) {
+    currentVolumeIndex = parseInt(savedVolume, 10);
+    targetVolume = volumeLevels[currentVolumeIndex];
+  }
+
+  bgm.volume = 0; // Start silent for autoplay
+  volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+
+  // Fade in audio to target volume
+  function fadeInAudio() {
+    let step = 0.01;
+    bgm.muted = false;
+    let fadeInterval = setInterval(() => {
+      if (bgm.volume < targetVolume) {
+        bgm.volume = Math.min(bgm.volume + step, targetVolume);
+      } else {
+        clearInterval(fadeInterval);
+      }
+    }, 100);
+  }
+
+  // Start BGM from the beginning
+  function startBGM() {
+    bgm.currentTime = 0; // Always start from beginning
+    bgm.play().then(() => {
+      fadeInAudio();
+    }).catch(() => {
+      console.log("Autoplay blocked, will start on first click.");
+    });
+  }
+
+  // Try autoplay on page load
+  window.addEventListener('load', () => {
+    startBGM();
+  });
+
+  // Fallback: play from start on first interaction
+  document.body.addEventListener('click', () => {
+    startBGM();
+  }, { once: true });
+
+  // Volume button
+  volumeBtn.addEventListener('click', () => {
+    currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
+    bgm.volume = volumeLevels[currentVolumeIndex];
+    targetVolume = volumeLevels[currentVolumeIndex];
+    volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+    localStorage.setItem('featherVolumeIndex', currentVolumeIndex);
+  });
+</script>
+
 </body>
 </html>

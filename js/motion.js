@@ -3,35 +3,38 @@ let lastAverage = 0;
 let flapCallback = null;
 let cooldown = false;
 
+const WIDTH = 160;
+const HEIGHT = 120;
+const MOTION_THRESHOLD = 5;     // Difference in brightness to trigger motion
+const COOLDOWN_TIME = 300;      // ms cooldown between flaps
+
 /**
  * Initialize motion detection
- * @param {Function} onFlap - callback when motion is detected
+ * @param {Function} onFlap - Callback when motion is detected
  */
 export async function initMotion(onFlap) {
   flapCallback = onFlap;
 
-  // Hidden video for webcam
-  video = document.createElement('video');
-  video.autoplay = true;
-  video.playsInline = true;
-  video.muted = true; // required for autoplay
-  video.width = 160;
-  video.height = 120;
+  // Setup hidden video
+  video = Object.assign(document.createElement('video'), {
+    autoplay: true,
+    playsInline: true,
+    muted: true,
+    width: WIDTH,
+    height: HEIGHT
+  });
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
     await video.play();
-    console.log("✅ Motion detection initialized");
   } catch (err) {
     console.error("❌ Webcam access denied:", err);
     return;
   }
 
   // Hidden canvas for processing frames
-  canvas = document.createElement('canvas');
-  canvas.width = 160;
-  canvas.height = 120;
+  canvas = Object.assign(document.createElement('canvas'), { width: WIDTH, height: HEIGHT });
   ctx = canvas.getContext('2d');
 
   // Start detection loop
@@ -47,30 +50,23 @@ function detectMotion() {
     return;
   }
 
-  // Draw current frame to canvas
-  ctx.drawImage(video, 0, 0, 160, 120);
-  const { data } = ctx.getImageData(0, 0, 160, 120);
+  // Draw current frame and get brightness data
+  ctx.drawImage(video, 0, 0, WIDTH, HEIGHT);
+  const { data } = ctx.getImageData(0, 0, WIDTH, HEIGHT);
 
-  // Calculate average brightness
+  // Compute average brightness
   let sum = 0;
   for (let i = 0; i < data.length; i += 4) {
-    const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-    sum += brightness;
+    sum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
   }
-  const avg = sum / (160 * 120);
+  const avg = sum / (WIDTH * HEIGHT);
   const diff = Math.abs(avg - lastAverage);
 
-  // Debug log
-  console.log(`avg: ${avg.toFixed(2)} | diff: ${diff.toFixed(2)}`);
-
-  // Trigger flap on significant motion
-  if (diff > 5 && !cooldown && flapCallback) {
-    console.log("🐤 Motion detected! Flap triggered!");
+  // Trigger flap if motion exceeds threshold
+  if (diff > MOTION_THRESHOLD && !cooldown && flapCallback) {
     flapCallback();
-
-    // Short cooldown to avoid spam flaps
     cooldown = true;
-    setTimeout(() => cooldown = false, 300);
+    setTimeout(() => cooldown = false, COOLDOWN_TIME);
   }
 
   lastAverage = avg;
