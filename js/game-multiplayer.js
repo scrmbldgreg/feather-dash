@@ -485,11 +485,6 @@ for (const [id, p] of Object.entries(players)) {
     
     // Show name
     ctx.fillText(p.name || 'Unknown', p.x, p.y - birdHeight / 2 - 20);
-
-    // Show x/y below the name
-    ctx.globalAlpha = 0.7; // slightly faded
-    ctx.fillText(`(${Math.round(p.x)}, ${Math.round(p.y)})`, p.x, p.y - birdHeight / 2);
-    ctx.globalAlpha = 1.0;
   }
 }
 
