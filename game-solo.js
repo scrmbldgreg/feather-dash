@@ -1,23 +1,9 @@
 // =========================
-// Firebase Init
-// =========================
-const db = firebase.firestore();
-
-// =========================
-// URL Params
-// =========================
-const urlParams = new URLSearchParams(window.location.search);
-let lobbyCode = urlParams.get('lobby');
-let playerId = urlParams.get('player') || Math.random().toString(36).substring(2, 9);
-let playerName = decodeURIComponent(urlParams.get('name') || '');
-
-console.log("🎮 Game Loaded with Params:", { lobbyCode, playerId, playerName });
-
-// =========================
 // DOM Elements
 // =========================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -29,21 +15,20 @@ const webcam = document.getElementById('webcam');
 const gameTimerEl = document.getElementById('timer');
 const scoreDisplay = document.getElementById('scoreDisplay');
 const prepCountdownEl = document.getElementById('prepCountdown');
-const leaderboardList = document.getElementById('leaderboardList');
+const bgm = document.getElementById('bgm'); // Background Music
+bgm.volume = 0.3;
 
 // =========================
 // Game State
 // =========================
-let bird = { x: 150, y: window.innerHeight / 2, velocity: -2 };
-let gravity = 0.5;
+let bird = { x: 150, y: window.innerHeight / 2, velocity: -2 }; // Center start
+let gravity = 0.5; // Adjusted for solo mode
 let score = 0;
-let timer = 45; // 45 seconds for multiplayer
+let timer = 30;
 let gameOver = false;
 let gameStarted = false;
-let players = {};
 let assetsLoaded = false;
 let webcamReady = false;
-let lobbyReady = false;
 
 let pipes = [];
 const pipeWidthRatio = 0.08;
@@ -52,27 +37,20 @@ let pipeSpeed = 5;
 let pipeSpawnInterval = 150;
 let frameCount = 0;
 const pipeScale = 0.6;
+// The bird scale was directly applied in drawImageProportional, so birdWidth and birdHeight are the actual draw sizes.
+const birdWidth = 80; // Adjusted to be closer to multiplayer's effective bird size
+const birdHeight = 80; // Adjusted to be closer to multiplayer's effective bird size
 
-let stunned = false;
+const groundHeight = 160;
 let stopped = false;
-let stunDuration = 1500;
-
-// Firestore update throttle
-let lastWriteTime = 0;
-const writeInterval = 200;
 
 // =========================
 // Assets
 // =========================
 const groundImg = document.getElementById('ground');
-const bird1Img = document.getElementById('bird1');
-const bird2Img = document.getElementById('bird2');
+const birdImg = document.getElementById('bird1'); // Only bird1Img is needed for solo
 const pipeTipImg = document.getElementById('pipeTip');
 const pipeBodyImg = document.getElementById('pipeBody');
-
-const birdWidth = 80;
-const birdHeight = 80;
-const groundHeight = 160;
 
 // =========================
 // Clouds
@@ -93,6 +71,7 @@ const cloudCount = 6;
 const cloudSpeed = 0.5;
 
 function spawnClouds() {
+  clouds = []; // Clear existing clouds
   for (let i = 0; i < cloudCount; i++) {
     const img = cloudImages[Math.floor(Math.random() * cloudImages.length)];
     clouds.push({
@@ -104,6 +83,8 @@ function spawnClouds() {
     });
   }
 }
+
+
 
 // =========================
 // Prep Countdown
@@ -138,11 +119,10 @@ function startPreparationCountdown() {
 // Preload Assets
 // =========================
 function preloadAssets() {
-  const assets = [groundImg, bird1Img, bird2Img, pipeTipImg, pipeBodyImg];
+  const assets = [groundImg, birdImg, pipeTipImg, pipeBodyImg];
   let loadedCount = 0;
 
   assets.forEach((img) => {
-    if (!img) return console.error("❌ Missing asset element:", img);
     if (img.complete) {
       loadedCount++;
       if (loadedCount === assets.length) markAssetsLoaded();
@@ -157,7 +137,7 @@ function preloadAssets() {
 
 function markAssetsLoaded() {
   assetsLoaded = true;
-  console.log("✅ Assets Loaded");
+  // In solo, we don't need to precompute birdDrawWidth/Height as we use fixed birdWidth/Height for drawing directly.
   tryStartGame();
 }
 preloadAssets();
@@ -171,7 +151,6 @@ navigator.mediaDevices
     webcam.srcObject = stream;
     webcam.addEventListener('canplay', () => {
       webcamReady = true;
-      console.log("✅ Webcam Ready");
       tryStartGame();
     });
   })
@@ -181,60 +160,10 @@ navigator.mediaDevices
   });
 
 // =========================
-// Firestore Lobby Handling
-// =========================
-async function joinLobby() {
-  if (!lobbyCode) {
-    alert('No lobby code found in URL!');
-    return;
-  }
-
-  const lobbyRef = db.collection('lobbies').doc(lobbyCode);
-
-  try {
-    const lobbyDoc = await lobbyRef.get();
-    if (!lobbyDoc.exists) {
-      alert('❌ Lobby does not exist!');
-      return;
-    }
-
-    // Add or merge player
-    await lobbyRef.collection('players').doc(playerId).set({
-      name: playerName || `Player-${playerId}`,
-      color: 'yellow',
-      x: bird.x,
-      y: bird.y,
-      score: 0,
-    }, { merge: true });
-
-    // Listen to players
-    lobbyRef.collection('players').onSnapshot((snapshot) => {
-      players = {};
-      snapshot.forEach((doc) => {
-        players[doc.id] = doc.data();
-      });
-
-      if (players[playerId]?.name) {
-        playerName = players[playerId].name;
-      }
-
-      updateLeaderboard();
-    });
-
-    lobbyReady = true;
-    console.log("✅ Lobby Ready");
-    tryStartGame();
-  } catch (err) {
-    console.error('❌ Lobby error:', err);
-  }
-}
-joinLobby();
-
-// =========================
 // Motion Detection
 // =========================
-const motionCanvas = document.getElementById('motionCanvas');
-const motionCtx = motionCanvas.getContext('2d');
+const motionCanvas = document.getElementById('motionCanvas'); // Assuming this exists in solo.html
+const motionCtx = motionCanvas.getContext('2d'); // Assuming this exists in solo.html
 
 let lastFrame = null;
 let motionThreshold = 1000;
@@ -273,12 +202,14 @@ function detectMotion() {
 }
 detectMotion();
 
+
 // =========================
 // Controls
 // =========================
-function flap() {
+function flap() { // Renamed from flapInternal to flap for consistency with multiplayer
   if (!gameStarted) return;
   bird.velocity = -8;
+  console.log("🐤 Flap triggered! Velocity:", bird.velocity);
 }
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') flap();
@@ -289,8 +220,7 @@ document.addEventListener('keydown', (e) => {
 // =========================
 function tryStartGame() {
   if (gameStarted) return;
-  if (assetsLoaded && webcamReady && lobbyReady) {
-    console.log("✅ All Ready, starting prep countdown...");
+  if (assetsLoaded && webcamReady) {
     spawnClouds();
     startPreparationCountdown();
   }
@@ -298,13 +228,12 @@ function tryStartGame() {
 
 function startGame() {
   gameStarted = true;
+  bgm.currentTime = 0;
+  bgm.play().catch(() => console.log('Autoplay blocked')); // Added catch for autoplay issues
   startTimer();
   console.log("🎮 Game started");
 
-  const bgm = document.getElementById('bgm');
-  bgm.volume = 0.3;
-  bgm.play().catch(err => console.warn("Audio autoplay blocked:", err));
-
+  // Spawn the first pipe immediately
   const gapHeight = canvas.height * pipeGapRatio;
   const topHeight = Math.random() * (canvas.height - gapHeight - groundHeight);
   pipes.push({ x: canvas.width, topHeight, gapHeight, scored: false });
@@ -326,18 +255,19 @@ function gameLoop() {
 // Update Game
 // =========================
 function update() {
+  // Bird physics
   bird.velocity += gravity;
   bird.y += bird.velocity;
 
   const groundY = canvas.height - groundHeight;
 
-  // Ceiling
+  // Ceiling collision
   if (bird.y - birdHeight / 2 <= 0) {
     bird.y = birdHeight / 2;
     bird.velocity = 0;
   }
 
-  // Floor
+  // Floor collision
   if (bird.y + birdHeight / 2 >= groundY) {
     bird.y = groundY - birdHeight / 2;
     bird.velocity = 0;
@@ -367,14 +297,14 @@ function update() {
     pipes = pipes.filter((pipe) => pipe.x + canvas.width * pipeWidthRatio > 0);
   }
 
-  // Pipe collision
+  // Pipe collision detection
   const birdLeft = bird.x - birdWidth / 2;
   const birdRight = bird.x + birdWidth / 2;
   const birdTop = bird.y - birdHeight / 2;
   const birdBottom = bird.y + birdHeight / 2;
 
   for (let pipe of pipes) {
-    const pipeWidth = canvas.width * pipeWidthRatio * pipeScale;
+    const pipeWidth = pipeBodyImg.naturalWidth * pipeScale; // Use actual image width for calculation
     const pipeLeft = pipe.x;
     const pipeRight = pipe.x + pipeWidth;
 
@@ -395,20 +325,9 @@ function update() {
     }
   }
 
-  // Clamp
+  // Clamp bird position (optional, but good for preventing bird from going off-screen)
   bird.x = Math.max(birdWidth / 2, Math.min(canvas.width - birdWidth / 2, bird.x));
   bird.y = Math.max(birdHeight / 2, Math.min(groundY - birdHeight / 2, bird.y));
-
-  // Firestore Updates
-  const now = Date.now();
-  if (now - lastWriteTime >= writeInterval) {
-    lastWriteTime = now;
-    db.collection('lobbies')
-      .doc(lobbyCode)
-      .collection('players')
-      .doc(playerId)
-      .update({ x: bird.x, y: bird.y, score: score });
-  }
 }
 
 function freezePipesTemporarily() {
@@ -450,11 +369,12 @@ function resolveCollision(rect) {
 // Draw
 // =========================
 function draw() {
+  // 1️⃣ Clear and draw sky
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#70c5ce';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Clouds
+  // 2️⃣ Clouds
   clouds.forEach(cloud => {
     cloud.x -= cloud.speed;
     if (cloud.x + cloud.img.naturalWidth * cloud.scale < 0) {
@@ -467,36 +387,26 @@ function draw() {
     ctx.drawImage(cloud.img, cloud.x, cloud.y, w, h);
   });
 
-  // Pipes
+  // 3️⃣ Pipes
   drawPipes();
 
-for (const [id, p] of Object.entries(players)) {
-  const img = id === playerId ? bird1Img : bird2Img;
-
-  // Own bird = full opacity, others = 50% opacity
-  ctx.globalAlpha = id === playerId ? 1.0 : 0.5;
-  ctx.drawImage(img, p.x - birdWidth / 2, p.y - birdHeight / 2, birdWidth, birdHeight);
-  ctx.globalAlpha = 1.0;
-
-  if (id !== playerId) {
-    ctx.fillStyle = 'white';
-    ctx.font = '16px Arial';
-    ctx.textAlign = 'center';
-    
-    // Show name
-    ctx.fillText(p.name || 'Unknown', p.x, p.y - birdHeight / 2 - 20);
-
-    // Show x/y below the name
-    ctx.globalAlpha = 0.7; // slightly faded
-    ctx.fillText(`(${Math.round(p.x)}, ${Math.round(p.y)})`, p.x, p.y - birdHeight / 2);
-    ctx.globalAlpha = 1.0;
-  }
-}
+  // 4️⃣ Draw bird
+  ctx.drawImage(birdImg, bird.x - birdWidth / 2, bird.y - birdHeight / 2, birdWidth, birdHeight);
 
 
-  // Ground
+  // 5️⃣ Ground
   drawGround();
 }
+
+// This function is no longer strictly needed as bird is drawn directly with fixed birdWidth/Height
+// but kept for consistency if other elements might use it.
+function drawImageProportional(img, x, y, maxWidth, maxHeight) {
+  const ratio = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
+  const width = img.naturalWidth * ratio;
+  const height = img.naturalHeight * ratio;
+  ctx.drawImage(img, x - width / 2, y - height / 2, width, height);
+}
+
 
 function drawPipes() {
   const pipeWidth = pipeBodyImg.naturalWidth * pipeScale;
@@ -529,23 +439,8 @@ function drawGround() {
   }
 }
 
-const volumeBtn = document.getElementById('volumeBtn');
-let volumeLevels = [0.25, 0.5, 0.75, 1, 0]; // 0 = mute
-let volumeIcons = ['🔉', '🔉', '🔊', '🔊', '🔇']; // simple icon cycle
-let currentVolumeIndex = 0; // start at 25% volume
-
-volumeBtn.addEventListener('click', () => {
-  currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
-  const newVolume = volumeLevels[currentVolumeIndex];
-  bgm.volume = newVolume;
-
-  // Update button icon
-  volumeBtn.textContent = volumeIcons[currentVolumeIndex];
-});
-
-
 // =========================
-// Timer & Leaderboard
+// Timer
 // =========================
 function startTimer() {
   const interval = setInterval(() => {
@@ -556,42 +451,19 @@ function startTimer() {
       if (timer <= 0) {
         clearInterval(interval);
         gameOver = true;
-
-        let winner = null;
-        let highestScore = -Infinity;
-
-        Object.entries(players).forEach(([id, p]) => {
-          if (p.score > highestScore) {
-            highestScore = p.score;
-            winner = p.name || `Player ${id.substring(0, 4)}`;
-          }
-        });
-
-        showWinnerOverlay(winner, highestScore);
+        showWinnerOverlay(score);
       }
     }
   }, 1000);
 }
 
-function updateLeaderboard() {
-  leaderboardList.innerHTML = '';
-  Object.entries(players)
-    .sort((a, b) => b[1].score - a[1].score)
-    .slice(0, 3)
-    .forEach(([id, p]) => {
-      const li = document.createElement('li');
-      li.textContent = `${p.name || ''}: ${p.score}`;
-      leaderboardList.appendChild(li);
-    });
-}
-
 // =========================
 // Winner Overlay
 // =========================
-function showWinnerOverlay(winner, score) {
-  console.log("🎉 Showing winner overlay:", winner, score);
+function showWinnerOverlay(finalScore) {
+  bgm.pause(); // Stop music
 
-  // Remove existing overlay if present
+  // Remove any existing overlay first
   const existing = document.getElementById('winnerOverlay');
   if (existing) existing.remove();
 
@@ -606,7 +478,7 @@ function showWinnerOverlay(winner, score) {
 
   overlay.innerHTML = `
     <div class="lobby-container" style="text-align:center;color:white;">
-      <h1 style="font-size:48px;margin-bottom:20px;">Sky Champion: ${winner}</h1>
+      <h1 style="font-size:48px;margin-bottom:20px;">Flight Ended</h1>
       <p style="font-size:28px;margin-bottom:30px;">Beak Points: ${score}</p>
       <div style="display:flex; justify-content:center; gap:20px;">
         <button id="playAgain" class="cta-button">Fly Again</button>
@@ -616,33 +488,49 @@ function showWinnerOverlay(winner, score) {
   `;
   document.body.appendChild(overlay);
 
-  // Exit button → Home page
+  document.getElementById('playAgain').onclick = () => {
+    // A simple page reload for "Fly Again" in solo mode
+    window.location.reload();
+  };
   document.getElementById('exitBtn').onclick = () => {
     window.location.href = 'index.html';
   };
-  // Fly Again → Reset player state & go to lobby
-document.getElementById('playAgain').onclick = async () => {
-  const lobbyRef = db.collection('lobbies').doc(lobbyCode);
-  const playerRef = lobbyRef.collection('players').doc(playerId);
-
-  await playerRef.update({
-    score: 0,
-    ready: false,
-    x: 100,
-    y: 300
-  });
-
-  // Optional: Mark rematch requested (if you want other players to know)
-  await lobbyRef.update({ rematchRequested: Date.now() });
-
-  // 🔹 Go back to the lobby page (host will still see this lobby)
-  window.location.href = 'gather-flock.html';
-};
-
-  // Auto return to lobby after 10s if user does nothing
-  setTimeout(() => {
-    if (document.body.contains(overlay)) {
-      window.location.href = `gather-flock.html`;
-    }
-  }, 10000);
 }
+const volumeBtn = document.getElementById('volumeBtn');
+let volumeLevels = [0.25, 0.5, 0.75, 1, 0]; // 0 = mute
+let volumeIcons = ['🔉', '🔉', '🔊', '🔊', '🔇']; // simple icon cycle
+let currentVolumeIndex = 0; // start at 25% volume
+
+volumeBtn.addEventListener('click', () => {
+  currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
+  const newVolume = volumeLevels[currentVolumeIndex];
+  bgm.volume = newVolume;
+
+  // Update button icon
+  volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+});
+
+// =========================
+// Reset Game
+// =========================
+function resetGame() {
+  bird = { x: 150, y: window.innerHeight / 2, velocity: 0 };
+  pipes = [];
+  score = 0;
+  timer = 30;
+  gameOver = false;
+  stopped = false;
+  scoreDisplay.textContent = `Beak Points: 0`;
+  gameTimerEl.textContent = timer;
+
+  // Reset clouds
+  spawnClouds();
+
+  // Restart game
+  bgm.currentTime = 0;
+  bgm.play().catch(() => console.log('Autoplay blocked'));
+  startPreparationCountdown();
+}
+
+// Export flap function for motion-solo.js (if still used externally)
+window.flap = flap;
