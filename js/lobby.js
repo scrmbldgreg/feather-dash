@@ -287,7 +287,7 @@ startGameBtn.onclick = async () => {
   if (playerId !== ownerId) return;
   const lobbyRef = db.collection('lobbies').doc(lobbyCode);
   await lobbyRef.update({ started: true });
-  window.location.href = `game.html?lobby=${lobbyCode}&player=${playerId}&name=${encodeURIComponent(playerName)}`;
+  window.location.href = `sky-race.html?lobby=${lobbyCode}&player=${playerId}&name=${encodeURIComponent(playerName)}`;
 };
 
 // =========================

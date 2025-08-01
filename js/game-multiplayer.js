@@ -29,7 +29,6 @@ const webcam = document.getElementById('webcam');
 const gameTimerEl = document.getElementById('timer');
 const scoreDisplay = document.getElementById('scoreDisplay');
 const prepCountdownEl = document.getElementById('prepCountdown');
-const volumeBtn = document.getElementById('volumeBtn');
 const leaderboardList = document.getElementById('leaderboardList');
 
 // =========================
@@ -303,7 +302,7 @@ function startGame() {
   console.log("🎮 Game started");
 
   const bgm = document.getElementById('bgm');
-  bgm.volume = 0.5;
+  bgm.volume = 0.3;
   bgm.play().catch(err => console.warn("Audio autoplay blocked:", err));
 
   const gapHeight = canvas.height * pipeGapRatio;
@@ -529,6 +528,21 @@ function drawGround() {
     ctx.fillRect(0, groundY + i * rowHeight, canvas.width, rowHeight);
   }
 }
+
+const volumeBtn = document.getElementById('volumeBtn');
+let volumeLevels = [0.25, 0.5, 0.75, 1, 0]; // 0 = mute
+let volumeIcons = ['🔉', '🔉', '🔊', '🔊', '🔇']; // simple icon cycle
+let currentVolumeIndex = 0; // start at 25% volume
+
+volumeBtn.addEventListener('click', () => {
+  currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
+  const newVolume = volumeLevels[currentVolumeIndex];
+  bgm.volume = newVolume;
+
+  // Update button icon
+  volumeBtn.textContent = volumeIcons[currentVolumeIndex];
+});
+
 
 // =========================
 // Timer & Leaderboard

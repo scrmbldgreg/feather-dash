@@ -499,7 +499,7 @@ function showWinnerOverlay(finalScore) {
 const volumeBtn = document.getElementById('volumeBtn');
 let volumeLevels = [0.25, 0.5, 0.75, 1, 0]; // 0 = mute
 let volumeIcons = ['🔉', '🔉', '🔊', '🔊', '🔇']; // simple icon cycle
-let currentVolumeIndex = 3; // start at 100% volume
+let currentVolumeIndex = 0; // start at 25% volume
 
 volumeBtn.addEventListener('click', () => {
   currentVolumeIndex = (currentVolumeIndex + 1) % volumeLevels.length;
